@@ -1,4 +1,4 @@
-package com.carvalho.demo_park_api;
+package com.carvalho.demo_park_api.config;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.test.context.TestConfiguration;

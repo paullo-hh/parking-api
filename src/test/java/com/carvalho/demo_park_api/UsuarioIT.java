@@ -1,5 +1,6 @@
 package com.carvalho.demo_park_api;
 
+import com.carvalho.demo_park_api.config.TestEnvironmentConfig;
 import com.carvalho.demo_park_api.web.dto.UsuarioCreateDTO;
 import com.carvalho.demo_park_api.web.dto.UsuarioResponseDTO;
 import org.junit.jupiter.api.Test;
