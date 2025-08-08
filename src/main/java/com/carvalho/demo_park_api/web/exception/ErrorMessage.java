@@ -1,5 +1,6 @@
 package com.carvalho.demo_park_api.web.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.*;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class ErrorMessage {
 
   private String message;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
   private Map<String, String> errors;
 
   public ErrorMessage() {

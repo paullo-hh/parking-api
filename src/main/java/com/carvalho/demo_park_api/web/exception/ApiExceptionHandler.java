@@ -1,5 +1,6 @@
 package com.carvalho.demo_park_api.web.exception;
 
+import com.carvalho.demo_park_api.exception.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class ApiExceptionHandler {
+
+  @ExceptionHandler(UsernameUniqueViolationException.class)
+  public ResponseEntity<ErrorMessage> methodArgumentNotValidException(UsernameUniqueViolationException exception,
+                                                                      HttpServletRequest httpServletRequest) {
+    log.error("API ERROR: ", exception);
+    return ResponseEntity
+        .status(HttpStatus.CONFLICT)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(new ErrorMessage(httpServletRequest, HttpStatus.CONFLICT, exception.getMessage()));
+  }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorMessage> methodArgumentNotValidException(MethodArgumentNotValidException exception,
