@@ -1,6 +1,8 @@
 package com.carvalho.demo_park_api.service;
 
 import com.carvalho.demo_park_api.entity.Usuario;
+import com.carvalho.demo_park_api.exception.EntityNotFoundException;
+import com.carvalho.demo_park_api.exception.PasswordInvalidException;
 import com.carvalho.demo_park_api.exception.UsernameUniqueViolationException;
 import com.carvalho.demo_park_api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +28,19 @@ public class UsuarioService {
   @Transactional(readOnly = true)
   public Usuario buscarPorId(Long id) {
     return usuarioRepository.findById(id).orElseThrow(
-        () -> new RuntimeException("Usuário não encontrado!")
+        () -> new EntityNotFoundException(String.format("Usuário ID:%s não encontrado!", id))
     );
   }
 
   @Transactional
   public Usuario editarSenha(Long id, String senhaAtual, String novaSenha, String confirmaSenha) {
     if (!novaSenha.equals(confirmaSenha)) {
-      throw new RuntimeException("Nova senha não confere com confirmação de senha.");
+      throw new PasswordInvalidException("Nova senha não confere com confirmação de senha.");
     }
 
     Usuario user = buscarPorId(id);
     if (!user.getPassword().equals(senhaAtual)) {
-      throw new RuntimeException("Seu senha não confere.");
+      throw new PasswordInvalidException("Seu senha não confere.");
     }
 
     user.setPassword(novaSenha);
