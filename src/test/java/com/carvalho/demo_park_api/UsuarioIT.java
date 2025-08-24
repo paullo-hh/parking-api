@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.List;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Sql(scripts = "/sql/usuario/usuario-insert.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/sql/usuario/usuario-delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -275,5 +277,19 @@ public class UsuarioIT {
 
     org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
     org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(422);
+  }
+
+  @Test
+  public void findUsuarios_Existentes_RetornarListaDeUsuariosComStatus200() {
+    List<UsuarioResponseDTO> usuarioResponseDTO = webTestClient
+        .get()
+        .uri("/api/v1/usuarios")
+        .exchange()
+        .expectStatus().isOk()
+        .expectBodyList(UsuarioResponseDTO.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(usuarioResponseDTO).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(usuarioResponseDTO).hasSize(3);
   }
 }
