@@ -4,7 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.test.context.TestConfiguration;
 
 @TestConfiguration
-public class TestEnvironmentConfig {
+public class TestEnvConfig {
 
   static {
     loadTestEnv();
