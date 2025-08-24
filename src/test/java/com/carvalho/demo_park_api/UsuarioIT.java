@@ -3,6 +3,7 @@ package com.carvalho.demo_park_api;
 import com.carvalho.demo_park_api.config.TestEnvConfig;
 import com.carvalho.demo_park_api.web.dto.UsuarioCreateDTO;
 import com.carvalho.demo_park_api.web.dto.UsuarioResponseDTO;
+import com.carvalho.demo_park_api.web.dto.UsuarioSenhaDTO;
 import com.carvalho.demo_park_api.web.exception.ErrorMessage;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,7 +100,7 @@ public class UsuarioIT {
     org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
     org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
-    // password menor que o requerido
+    // senha menor que o requerido (6 dígitos)
     responseBody = webTestClient
         .post()
         .uri("/api/v1/usuarios")
@@ -113,7 +114,7 @@ public class UsuarioIT {
     org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
     org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
 
-    // password maior que o requerido
+    // senha maior que o requerido (6 dígitos)
     responseBody = webTestClient
         .post()
         .uri("/api/v1/usuarios")
@@ -172,5 +173,107 @@ public class UsuarioIT {
 
     org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
     org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(404);
+  }
+
+  @Test
+  public void updatePasswordUsuario_ComDadosValidos_RetornarStatus204() {
+    webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("123456", "112233", "112233"))
+        .exchange()
+        .expectStatus().isNoContent();
+  }
+
+  @Test
+  public void updatePasswordUsuario_ComSenhasInvalidas_RetornarStatus400() {
+    // senha atual invalida
+    ErrorMessage errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("123458", "112233", "112233"))
+        .exchange()
+        .expectStatus().isEqualTo(400)
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(400);
+
+    // nova senha invalida
+    errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("123456", "112222", "113333"))
+        .exchange()
+        .expectStatus().isEqualTo(400)
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(400);
+  }
+
+  @Test
+  public void updatePasswordUsuario_ComIdInexistente_RetornarStatus404() {
+    ErrorMessage errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/0")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("123456", "112233", "112233"))
+        .exchange()
+        .expectStatus().isNotFound()
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(404);
+  }
+
+  @Test
+  public void updatePasswordUsuario_ComCamposInvalidos_RetornarStatus422() {
+    ErrorMessage errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("", "", ""))
+        .exchange()
+        .expectStatus().isEqualTo(422)
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(422);
+
+    // senha menor que o requerido (6 dígitos)
+    errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("12345", "12345", "12345"))
+        .exchange()
+        .expectStatus().isEqualTo(422)
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(422);
+
+    // senha maior que o requerido (6 dígitos)
+    errorMessage = webTestClient
+        .patch()
+        .uri("/api/v1/usuarios/100")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue(new UsuarioSenhaDTO("1234567", "1234567", "1234567"))
+        .exchange()
+        .expectStatus().isEqualTo(422)
+        .expectBody(ErrorMessage.class)
+        .returnResult().getResponseBody();
+
+    org.assertj.core.api.Assertions.assertThat(errorMessage).isNotNull();
+    org.assertj.core.api.Assertions.assertThat(errorMessage.getStatus()).isEqualTo(422);
   }
 }
